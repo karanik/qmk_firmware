@@ -78,8 +78,8 @@ __attribute__((weak)) void unicode_input_start(void) {
     clear_mods();                     // Unregister mods to start from a clean state
 
     switch (unicode_config.input_mode) {
-        case UC_OSX:
-            register_code(UNICODE_KEY_OSX);
+        case UC_MAC:
+            register_code(UNICODE_KEY_MAC);
             break;
         case UC_LNX:
             tap_code16(UNICODE_KEY_LNX);
@@ -99,8 +99,8 @@ __attribute__((weak)) void unicode_input_start(void) {
 
 __attribute__((weak)) void unicode_input_finish(void) {
     switch (unicode_config.input_mode) {
-        case UC_OSX:
-            unregister_code(UNICODE_KEY_OSX);
+        case UC_MAC:
+            unregister_code(UNICODE_KEY_MAC);
             break;
         case UC_LNX:
             tap_code(KC_SPC);
@@ -118,8 +118,8 @@ __attribute__((weak)) void unicode_input_finish(void) {
 
 __attribute__((weak)) void unicode_input_cancel(void) {
     switch (unicode_config.input_mode) {
-        case UC_OSX:
-            unregister_code(UNICODE_KEY_OSX);
+        case UC_MAC:
+            unregister_code(UNICODE_KEY_MAC);
             break;
         case UC_LNX:
         case UC_WINC:
@@ -147,6 +147,24 @@ void register_hex(uint16_t hex) {
     for (int i = 3; i >= 0; i--) {
         uint8_t digit = ((hex >> (i * 4)) & 0xF);
         tap_code(hex_to_keycode(digit));
+    }
+}
+
+void register_hex32(uint32_t hex) {
+    bool onzerostart = true;
+    for (int i = 7; i >= 0; i--) {
+        if (i <= 3) {
+            onzerostart = false;
+        }
+        uint8_t digit = ((hex >> (i * 4)) & 0xF);
+        if (digit == 0) {
+            if (!onzerostart) {
+                tap_code(hex_to_keycode(digit));
+            }
+        } else {
+            tap_code(hex_to_keycode(digit));
+            onzerostart = false;
+        }
     }
 }
 
@@ -192,9 +210,7 @@ const char *decode_utf8(const char *str, int32_t *code_point) {
         *code_point = ((int32_t)(str[0] & 0x0F) << 12) | ((int32_t)(str[1] & 0x3F) << 6) | ((int32_t)(str[2] & 0x3F) << 0);
         next        = str + 3;
     } else if ((str[0] & 0xF8) == 0xF0 && (str[0] <= 0xF4)) {  // U+10000-10FFFF
-        // Skip for now - register_hex() only takes a uint16
-        //*code_point = ((int32_t)(str[0] & 0x07) << 18) | ((int32_t)(str[1] & 0x3F) << 12) | ((int32_t)(str[2] & 0x3F) << 6) | ((int32_t)(str[3] & 0x3F) << 0);
-        *code_point = -1;
+        *code_point = ((int32_t)(str[0] & 0x07) << 18) | ((int32_t)(str[1] & 0x3F) << 12) | ((int32_t)(str[2] & 0x3F) << 6) | ((int32_t)(str[3] & 0x3F) << 0);
         next        = str + 4;
     } else {
         *code_point = -1;
@@ -221,7 +237,7 @@ void send_unicode_string(const char *str) {
 
         if (code_point >= 0) {
             unicode_input_start();
-            register_hex(code_point);
+            register_hex32(code_point);
             unicode_input_finish();
         }
     }
@@ -237,11 +253,11 @@ bool process_unicode_common(uint16_t keycode, keyrecord_t *record) {
                 cycle_unicode_input_mode(-1);
                 break;
 
-            case UNICODE_MODE_OSX:
-                set_unicode_input_mode(UC_OSX);
-#if defined(AUDIO_ENABLE) && defined(UNICODE_SONG_OSX)
-                static float song_osx[][2] = UNICODE_SONG_OSX;
-                PLAY_SONG(song_osx);
+            case UNICODE_MODE_MAC:
+                set_unicode_input_mode(UC_MAC);
+#if defined(AUDIO_ENABLE) && defined(UNICODE_SONG_MAC)
+                static float song_mac[][2] = UNICODE_SONG_MAC;
+                PLAY_SONG(song_mac);
 #endif
                 break;
             case UNICODE_MODE_LNX:
