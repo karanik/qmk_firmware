@@ -155,7 +155,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 typedef struct __attribute__((__packed__)) {
-    uint8_t  *current_element;
+    uint8_t *current_element;
     uint16_t remaining_element_count;
 } oled_buffer_reader_t;
 
@@ -256,6 +256,10 @@ bool oled_on(void);
 // Can be used to manually turn off the screen if it is on
 // Returns true if the screen was off or turns off
 bool oled_off(void);
+
+// Returns true if the oled is currently on, false if it is
+// not
+bool is_oled_on(void);
 
 // Basically it's oled_render, but with timeout management and oled_task_user calling!
 void oled_task(void);
