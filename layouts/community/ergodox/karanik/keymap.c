@@ -71,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------|  -_  |           |  -_  |------+------+------+------+------+--------|
  * | LShift |   Z  |   X  |   C  |   V  |   B  |      |           |      |   N  |   M  |  ,<  |  .>  |  Up  | RShift |
  * `--------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
- *   |      | LWin |  `~  | LAlt |  \|  |                                       |  /?  | RCtrl| Left | Down | Right |  
+ *   |      | LWin |  `~  | LAlt |  \|  |                                       |  /?  | RCtrl| Left | Down | Right |
  *   `----------------------------------'                                       `----------------------------------'
  *                                        ,-------------.       ,-------------.
  *                                        |  [{  |  ]}  |       |  F7  |      |
@@ -85,9 +85,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // left hand
         MO(SYMB),         KC_1,            KC_2,     KC_3,     KC_4,     KC_5,   KC_ESC,
         LT(MDIA, KC_TAB), KC_Q,            KC_W,     KC_E,     KC_R,     KC_T,   KC_EQL,
-        KC_LCTRL,         KC_A,            KC_S,     KC_D,     KC_F,     KC_G,
+        KC_LCTL,          KC_A,            KC_S,     KC_D,     KC_F,     KC_G,
         KC_LSFT,          KC_Z,            KC_X,     KC_C,     KC_V,     KC_B,   KC_MINS,
-        _______,          KC_LGUI,         KC_GRV,  KC_LALT,  KC_BSLS,  
+        _______,          KC_LGUI,         KC_GRV,  KC_LALT,  KC_BSLS,
                                                      KC_LBRC, KC_RBRC,
                                                                KC_APP,
                                             KC_SPC,  KC_TRNS,  LCTL(KC_Z),
@@ -96,10 +96,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
              KC_EQL,     KC_Y,   KC_U,    KC_I,    KC_O,   KC_P,             MO(SYMB),
                          KC_H,   KC_J,    KC_K,    KC_L,   KC_SCLN,          KC_ENT,
              KC_MINS,    KC_N,   KC_M,    KC_COMM, KC_DOT, KC_UP,            KC_RSFT,
-                                 KC_SLSH, KC_RCTRL, KC_LEFT, KC_DOWN,        KC_RIGHT,
+                                 KC_SLSH, KC_LCTL, KC_LEFT, KC_DOWN,        KC_RIGHT,
              KC_F7, _______,
              KC_F8,
-             KC_PSCR,KC_BSPC, KC_SPC
+             KC_PSCR, KC_BSPC, KC_SPC
     ),
 #endif
 
@@ -137,14 +137,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                                         KC_TRNS,
                                                         KC_TRNS,TO(BASE),KC_TRNS,
        // right hand
-       KC_TRNS, KC_F6,   KC_F7,    KC_F8,    KC_F9,      KC_F10,    KC_DELT,
+       KC_TRNS, KC_F6,   KC_F7,    KC_F8,    KC_F9,      KC_F10,    KC_DEL,
        KC_PPLS, KC_PGUP, KC_HOME,  KC_UP,    KC_END,     KC_F11,    KC_TRNS,
                 KC_PGDN, KC_LEFT,  KC_DOWN,  KC_RIGHT,   KC_F12,   KC_TRNS,
        KC_PMNS, _______, KC_TRNS,  KC_INS,   KC_TRNS,     KC_PGUP,   KC_TRNS,
                          KC_TRNS,  KC_TRNS,  KC_HOME,    KC_PGDN,   KC_END,
        KC_TRNS, KC_TRNS,
        KC_TRNS,
-       KC_TRNS, KC_DELT, KC_TRNS
+       KC_TRNS, KC_DEL, KC_TRNS
 ),
 /* Keymap 2: Media and mouse keys
  *
@@ -179,7 +179,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                   KC_TRNS, KC_TRNS, KC_TRNS,
     // right hand
        KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-       KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  
+       KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
        KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_VOLU, KC_MEDIA_PLAY_PAUSE,
                           KC_MUTE, KC_TRNS, KC_MPRV, KC_VOLD,KC_MNXT,
@@ -193,7 +193,8 @@ const uint16_t PROGMEM fn_actions[] = {
     [1] = ACTION_LAYER_TAP_TOGGLE(SYMB)                // FN1 - Momentary Layer 1 (Symbols)  // KC_FN1
 };
 
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt) 
+#if 0
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
   // MACRODOWN only works in this function
   switch(id) {
@@ -210,7 +211,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
   }
   return MACRO_NONE;
 };
-
+#endif
 
 /**
  * Change shift+backspace into delete and do not register the shift modifier.
@@ -296,7 +297,7 @@ void matrix_scan_user(void) {
 };
 
 // Runs whenever there is a layer state change.
-uint32_t layer_state_set_user(uint32_t state) {
+layer_state_t layer_state_set_user(layer_state_t state) {
   ergodox_board_led_off();
   ergodox_right_led_1_off();
   ergodox_right_led_2_off();
